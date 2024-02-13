@@ -1,0 +1,10 @@
+mssql:
+  datasource:
+    jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=tournament_tracker;encrypt=true;trustServerCertificate=true
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: sa
+    password: student
+
+spring:
+  jpa:
+    show-sql: true
