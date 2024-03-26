@@ -1,21 +1,20 @@
-package com.TournamentTracker.sport;
+package com.TournamentTracker.domain.sport;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "sport")
-public class Sport {
-
+class Sport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true)
+    @Column(name = "id")
     Long id;
     @Column(name = "name")
-    String name;
+    String sportName;
 }

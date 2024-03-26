@@ -1,4 +1,6 @@
-HELP.md
+LICENSE.md
+README.md
+/src/main/resources/env.properties
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

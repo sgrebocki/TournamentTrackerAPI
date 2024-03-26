@@ -1,4 +1,4 @@
-package com.TournamentTracker.config;
+package com.TournamentTracker.config.db;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +26,6 @@ import java.util.HashMap;
         transactionManagerRef = "mssqlTransactionManager"
 )
 public class DatabaseConfig {
-
     @Primary
     @Bean
     @ConfigurationProperties(prefix = "mssql.datasource")
