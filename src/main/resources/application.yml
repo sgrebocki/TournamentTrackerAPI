@@ -1,10 +1,16 @@
 mssql:
   datasource:
-    jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=tournament_tracker;encrypt=true;trustServerCertificate=true
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    username: sa
-    password: student
+    jdbc-url: ${TT_DATASOURCE_URL}
+    driver-class-name: ${TT_DATASOURCE_DRIVER}
+    username: ${TT_DATASOURCE_USERNAME}
+    password: ${TT_DATASOURCE_PASSWORD}
 
 spring:
   jpa:
     show-sql: true
+  config:
+    import: env.properties
+
+springdoc:
+  swagger-ui:
+    enabled: true
