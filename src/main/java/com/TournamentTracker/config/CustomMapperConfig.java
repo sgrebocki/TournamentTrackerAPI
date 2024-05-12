@@ -9,5 +9,5 @@ import org.mapstruct.*;
     nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL,
     collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED
 )
-public interface CommonMapperConfig {
+public interface CustomMapperConfig {
 }
