@@ -1,7 +1,10 @@
 package com.TournamentTracker.domain.sport;
 
-import com.TournamentTracker.domain.sport.dto.SportDto;
+import com.TournamentTracker.domain.sport.model.SportCreateDto;
+import com.TournamentTracker.domain.sport.model.SportDto;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,27 +16,39 @@ class SportController {
     private final SportService sportService;
 
     @GetMapping
-    public List<SportDto> getAllSports(){
-        return sportService.getAll();
+    public ResponseEntity<List<SportDto>> getAllSports(){
+        List<SportDto> sportList = sportService.getAll();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(sportList);
     }
 
     @GetMapping("/{id}")
-    public SportDto getSportById(@PathVariable Long id){
-        return sportService.getById(id);
+    public ResponseEntity<SportDto> getSportById(@PathVariable Long id){
+        SportDto sport = sportService.getById(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(sport);
     }
 
     @PostMapping()
-    public SportDto addSport(@RequestBody SportDto sportDto){
-        return sportService.create(sportDto);
+    public ResponseEntity<?> addSport(@RequestBody SportCreateDto sportDto){
+        try {
+            SportDto sportCreateDto = sportService.create(sportDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(sportCreateDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public SportDto editSport(@RequestBody SportDto sportDto, @PathVariable Long id){
-        return sportService.update(sportDto, id);
+    public ResponseEntity<SportDto> editSport(@RequestBody SportDto sportDto, @PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(sportService.update(sportDto, id));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteSport(@PathVariable Long id){
+    public ResponseEntity<Void> deleteSport(@PathVariable Long id){
         sportService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }

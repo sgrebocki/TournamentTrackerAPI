@@ -1,5 +1,6 @@
-package com.TournamentTracker.domain.sport;
+package com.TournamentTracker.domain.sport.model;
 
+import com.TournamentTracker.domain.rule.model.Rule;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,14 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @Table(name = "sport")
-class Sport {
+public class Sport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    Long id;
+    private Long id;
     @Column(name = "name")
-    String sportName;
+    private String sportName;
+    @OneToOne
+    @JoinColumn(name = "rule_id")
+    private Rule rule;
 }
