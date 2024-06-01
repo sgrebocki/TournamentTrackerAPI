@@ -1,5 +1,7 @@
 package com.TournamentTracker.domain.tournament;
 
+import com.TournamentTracker.domain.game.model.GameTournamentDto;
+import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import com.TournamentTracker.domain.tournament.model.TournamentCreateDto;
 import com.TournamentTracker.domain.tournament.model.TournamentDto;
 import lombok.AllArgsConstructor;
@@ -46,5 +48,19 @@ class TournamentController {
         tournamentService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
+    }
+
+    @GetMapping("/{id}/games")
+    public ResponseEntity<List<GameTournamentDto>> getTournamentGames(@PathVariable Long id){
+        List<GameTournamentDto> games = tournamentService.getMappedGames(tournamentService.getById(id));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(games);
+    }
+
+    @GetMapping("/{id}/teams")
+    public ResponseEntity<List<TeamTournamentDto>> getTournamentTeams(@PathVariable Long id){
+        List<TeamTournamentDto> teams = tournamentService.getMappedTeams(tournamentService.getById(id));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(teams);
     }
 }

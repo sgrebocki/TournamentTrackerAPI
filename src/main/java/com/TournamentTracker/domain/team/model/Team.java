@@ -16,9 +16,14 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "name")
     private String name;
+
     @OneToOne
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
+
+    public Team(Long teamId) {
+    }
 }

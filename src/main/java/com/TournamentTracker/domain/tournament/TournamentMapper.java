@@ -20,6 +20,7 @@ public interface TournamentMapper {
     Tournament toEntity(TournamentDto tournamentDto);
     @Mapping(source = "sportId", target = "sport.id")
     Tournament toEntity(TournamentCreateDto tournamentCreateDto);
+    Tournament toEntity(TournamentTeamDto tournamentTeamDto);
     List<TournamentDto> toDtoList(List<Tournament> tournaments);
 
 
