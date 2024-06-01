@@ -1,6 +1,7 @@
 package com.TournamentTracker.domain.user;
 
 import com.TournamentTracker.config.CustomMapperConfig;
+import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.domain.user.model.User;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
@@ -17,4 +18,6 @@ public interface UserMapper {
     @Mapping(source = "teamId", target = "team.id")
     User toEntity(UserDto userDto);
     User toEntity(UserCreateDto userCreateDto);
+    AuthUserDto toAuthUserDto(User user);
+    User toEntity(AuthUserDto authUserDto);
 }

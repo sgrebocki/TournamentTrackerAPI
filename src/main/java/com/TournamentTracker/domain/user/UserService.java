@@ -1,5 +1,6 @@
 package com.TournamentTracker.domain.user;
 
+import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.model.Authority;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
@@ -17,5 +18,5 @@ public interface UserService {
     UserDto addAuthority(Long userId, Authority authority);
     UserDto removeAuthority(Long userId, Authority authority);
     UserDto updateAuthorities(Long userId, Set<Authority> authorities);
-    UserDto getByUsername(String username);
+    AuthUserDto getByUsername(String username);
 }
