@@ -1,4 +1,4 @@
-package com.TournamentTracker.security.auth;
+package com.TournamentTracker.security.auth.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,9 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-class AuthResponse {
-    String accessToken;
+public class AuthRequest {
+    String username;
+    String password;
 }

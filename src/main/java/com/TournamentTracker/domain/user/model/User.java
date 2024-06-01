@@ -1,7 +1,7 @@
 package com.TournamentTracker.domain.user.model;
 
 import com.TournamentTracker.domain.team.model.Team;
-import com.TournamentTracker.security.auth.Authority;
+import com.TournamentTracker.security.auth.model.Authority;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

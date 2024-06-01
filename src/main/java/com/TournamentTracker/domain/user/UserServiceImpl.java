@@ -1,12 +1,14 @@
 package com.TournamentTracker.domain.user;
 
 import com.TournamentTracker.domain.team.model.Team;
-import com.TournamentTracker.security.auth.Authority;
+import com.TournamentTracker.security.auth.model.Authority;
 import com.TournamentTracker.domain.user.model.User;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +92,12 @@ public class UserServiceImpl implements UserService {
                     user.setAuthorities(authorities);
                     return userMapper.toDto(userRepository.save(user));
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+    }
+
+    public UserDto getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(userMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
     }
 
     private void checkIfUserAlreadyExists(UserCreateDto userCreateDto) {

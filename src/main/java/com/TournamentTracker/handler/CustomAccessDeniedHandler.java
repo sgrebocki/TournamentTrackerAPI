@@ -1,4 +1,4 @@
-package com.TournamentTracker.config.handler;
+package com.TournamentTracker.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
