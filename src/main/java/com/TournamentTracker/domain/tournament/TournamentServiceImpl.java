@@ -66,7 +66,6 @@ class TournamentServiceImpl implements TournamentService{
         if((authService.getCurrentUser().getId().equals(tournamentDto.getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
             return tournamentRepository.findById(id)
                     .map(editTournament -> {
-                        editTournament.setId(id);
                         editTournament.setName(tournamentDto.getName());
                         editTournament.setDateTime(tournamentDto.getDateTime());
                         editTournament.setLocation(tournamentDto.getLocation());

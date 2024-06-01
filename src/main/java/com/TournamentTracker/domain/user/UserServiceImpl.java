@@ -58,6 +58,7 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
+    @Transactional
     public void deleteById(Long id) {
         UserDto userDto = getById(id);
         userDto.getAuthorities().clear();

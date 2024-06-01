@@ -2,7 +2,6 @@ package com.TournamentTracker.domain.team;
 
 import com.TournamentTracker.domain.team.model.TeamCreateDto;
 import com.TournamentTracker.domain.team.model.TeamDto;
-import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/teams")
+@RequestMapping("/api/teams")
 class TeamController {
     private final TeamService teamService;
 

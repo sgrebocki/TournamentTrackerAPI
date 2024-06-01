@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/tournaments")
+@RequestMapping("/api/tournaments")
 class TournamentController {
     private final TournamentService tournamentService;
 
