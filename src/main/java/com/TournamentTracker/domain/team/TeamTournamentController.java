@@ -5,19 +5,23 @@ import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/teams/tournament")
 class TeamTournamentController {
     private final TeamTournamentService teamTournamentService;
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TeamTournamentDto> editTeam(@RequestBody TeamDto teamDto, @PathVariable Long id){
+    @PutMapping("/signUp/{id}")
+    public ResponseEntity<TeamTournamentDto> signUpForTournament(@RequestBody TeamDto teamDto, @PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(teamTournamentService.update(teamDto, id));
+                .body(teamTournamentService.signUpForTournament(teamDto, id));
+    }
+
+    @PutMapping("/signOut/{id}")
+    public ResponseEntity<TeamTournamentDto> signOutFromTournament(@RequestBody TeamDto teamDto, @PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(teamTournamentService.signOutFromTournament(teamDto, id));
     }
 }
