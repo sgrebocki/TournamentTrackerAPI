@@ -1,4 +1,4 @@
-package com.TournamentTracker.handler;
+package com.TournamentTracker.util.handler;
 
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
