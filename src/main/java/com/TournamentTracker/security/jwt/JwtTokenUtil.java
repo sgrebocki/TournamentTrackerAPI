@@ -1,4 +1,4 @@
-package com.TournamentTracker.security;
+package com.TournamentTracker.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

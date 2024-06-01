@@ -1,6 +1,6 @@
 package com.TournamentTracker.domain.user;
 
-import com.TournamentTracker.security.auth.Authority;
+import com.TournamentTracker.security.auth.model.Authority;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
 import lombok.AllArgsConstructor;

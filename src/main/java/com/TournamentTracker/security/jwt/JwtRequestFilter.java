@@ -1,4 +1,4 @@
-package com.TournamentTracker.security;
+package com.TournamentTracker.security.jwt;
 
 import com.TournamentTracker.security.auth.UserDetailsServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;

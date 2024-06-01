@@ -1,10 +1,10 @@
-package com.TournamentTracker.security.auth;
+package com.TournamentTracker.security.auth.model;
 
 import org.springframework.security.core.GrantedAuthority;
 
 public enum Authority implements GrantedAuthority {
     ADMIN,
-    TOURNAMENT_CREATOR,
+    TOURNAMENT_OWNER,
     TEAM_OWNER,
     PLAYER;
 

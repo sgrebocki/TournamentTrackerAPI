@@ -3,9 +3,12 @@ package com.TournamentTracker.security.auth;
 import com.TournamentTracker.domain.user.UserService;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
-import com.TournamentTracker.security.JwtTokenUtil;
+import com.TournamentTracker.security.jwt.JwtTokenUtil;
+import com.TournamentTracker.security.auth.model.AuthRequest;
+import com.TournamentTracker.security.auth.model.AuthResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,19 +28,19 @@ public class AuthController {
     private final UserDetailsServiceImpl userDetailsService;
     private final UserService userService;
 
-    @PostMapping("/authenticate")
+    @PostMapping(value = "/authenticate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest authRequest) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
             final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
             final String token = jwtTokenUtil.generateToken(userDetails);
-            return ResponseEntity.ok(AuthResponse.builder().accessToken(token));
+            return ResponseEntity.ok(new AuthResponse(token));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Niepoprawny login lub hasło");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password");
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@RequestBody UserCreateDto userDto) {
         try {
             UserDto createdUser = userService.create(userDto);
