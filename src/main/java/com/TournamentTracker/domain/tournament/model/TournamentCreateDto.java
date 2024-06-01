@@ -12,5 +12,6 @@ public class TournamentCreateDto {
     Date dateTime;
     String location;
     String street;
+    Long ownerId;
     Long sportId;
 }

@@ -28,6 +28,8 @@ public class Tournament {
     private String location;
     @Column(name = "street")
     private String street;
+    @Column(name = "owner_id")
+    private Long ownerId;
     @ManyToOne
     @JoinColumn(name = "sport_id")
     private Sport sport;

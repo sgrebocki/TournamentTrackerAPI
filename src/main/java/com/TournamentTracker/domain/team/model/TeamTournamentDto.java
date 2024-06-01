@@ -14,6 +14,7 @@ public class TeamTournamentDto {
     Integer id;
     @NotNull(message = "Team name can't be null")
     String name;
+    Long ownerId;
     @JsonIgnore
     Long tournamentId;
 }
