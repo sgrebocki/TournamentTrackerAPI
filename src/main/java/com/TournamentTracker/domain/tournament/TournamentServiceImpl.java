@@ -76,14 +76,14 @@ class TournamentServiceImpl implements TournamentService{
         tournamentRepository.deleteById(id);
     }
 
-    private List<GameTournamentDto> getMappedGames(TournamentDto tournamentDto) {
+    public List<GameTournamentDto> getMappedGames(TournamentDto tournamentDto) {
         return gameService.getOnlyGames()
                 .stream()
                 .filter(game -> game.getTournamentId() != null && game.getTournamentId().equals(tournamentDto.getId()))
                 .collect(Collectors.toList());
     }
 
-    private List<TeamTournamentDto> getMappedTeams(TournamentDto tournamentDto) {
+    public List<TeamTournamentDto> getMappedTeams(TournamentDto tournamentDto) {
         return teamService.getOnlyTeams()
                 .stream()
                 .filter(team -> team.getTournamentId() != null && team.getTournamentId().equals(tournamentDto.getId()))

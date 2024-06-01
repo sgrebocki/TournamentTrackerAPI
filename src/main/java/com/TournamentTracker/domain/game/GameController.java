@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping("/games")
 class GameController {
     private final GameService gameService;
+    private final GameTeamService gameTeamService;
 
     @GetMapping
     public ResponseEntity<List<GameDto>> getAllGames(){
@@ -32,7 +33,7 @@ class GameController {
     @PostMapping()
     public ResponseEntity<?> addGame(@RequestBody GameCreateDto gameCreateDto){
         try {
-            GameDto gameDto = gameService.create(gameCreateDto);
+            GameDto gameDto = gameTeamService.create(gameCreateDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(gameDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -42,7 +43,7 @@ class GameController {
     @PutMapping("/{id}")
     public ResponseEntity<GameDto> editGame(@RequestBody GameDto gameDto, @PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(gameService.update(gameDto, id));
+                .body(gameTeamService.update(gameDto, id));
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,7 @@
 package com.TournamentTracker.domain.game.model;
 
-import com.TournamentTracker.domain.tournament.model.Tournament;
+import com.TournamentTracker.domain.team.model.TeamDto;
+import com.TournamentTracker.domain.tournament.model.TournamentTeamDto;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,6 +10,10 @@ import java.util.Date;
 public class GameDto {
     Long id;
     Date gameTime;
-    String score;
-    Tournament tournament;
+    TeamDto homeTeam;
+    Long homeTeamScore;
+    TeamDto guestTeam;
+    Long guestTeamScore;
+    String finalScore;
+    TournamentTeamDto tournament;
 }
