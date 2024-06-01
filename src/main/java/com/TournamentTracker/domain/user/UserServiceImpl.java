@@ -1,14 +1,13 @@
 package com.TournamentTracker.domain.user;
 
 import com.TournamentTracker.domain.team.model.Team;
+import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.model.Authority;
 import com.TournamentTracker.domain.user.model.User;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,7 @@ public class UserServiceImpl implements UserService {
         checkIfUserAlreadyExists(userCreateDto);
         User user = userMapper.toEntity(userCreateDto);
         user.setAuthorities(new HashSet<>());
-        user.getAuthorities().add(Authority.PLAYER);
+        user.getAuthorities().add(Authority.ROLE_USER);
         user.setPassword(passwordEncoder.encode(userCreateDto.getPassword()));
         return userMapper.toDto(userRepository.save(user));
     }
@@ -60,10 +59,20 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteById(Long id) {
+        UserDto userDto = getById(id);
+        userDto.getAuthorities().clear();
+        userRepository.save(userMapper.toEntity(userDto));
         userRepository.deleteById(id);
     }
 
+    @Transactional
     public void deleteMany(List<Long> ids){
+        for(Long id : ids) {
+            UserDto userDto = getById(id);
+
+            userDto.getAuthorities().clear();
+            userRepository.save(userMapper.toEntity(userDto));
+        }
         userRepository.deleteAllById(ids);
     }
 
@@ -94,9 +103,9 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
     }
 
-    public UserDto getByUsername(String username) {
+    public AuthUserDto getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(userMapper::toDto)
+                .map(userMapper::toAuthUserDto)
                 .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
     }
 
