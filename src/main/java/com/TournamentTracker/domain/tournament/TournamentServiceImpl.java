@@ -1,24 +1,22 @@
 package com.TournamentTracker.domain.tournament;
 
 import com.TournamentTracker.domain.game.GameService;
-import com.TournamentTracker.domain.game.model.GameDto;
 import com.TournamentTracker.domain.game.model.GameTournamentDto;
 import com.TournamentTracker.domain.sport.SportMapper;
 import com.TournamentTracker.domain.sport.SportService;
-import com.TournamentTracker.domain.team.TeamMapper;
 import com.TournamentTracker.domain.team.TeamService;
-import com.TournamentTracker.domain.team.model.TeamDto;
 import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import com.TournamentTracker.domain.tournament.model.Tournament;
 import com.TournamentTracker.domain.tournament.model.TournamentCreateDto;
 import com.TournamentTracker.domain.tournament.model.TournamentDto;
-import com.TournamentTracker.domain.tournament.model.TournamentTeamDto;
+import com.TournamentTracker.domain.user.UserService;
+import com.TournamentTracker.security.auth.AuthService;
+import com.TournamentTracker.security.auth.model.Authority;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +28,8 @@ class TournamentServiceImpl implements TournamentService{
     private final SportMapper sportMapper;
     private final GameService gameService;
     private final TeamService teamService;
-    private final TeamMapper teamMapper;
+    private final AuthService authService;
+    private final UserService userService;
 
     public List<TournamentDto> getAll() {
         List<TournamentDto> tournaments = tournamentMapper.toDtoList(tournamentRepository.findAll());
@@ -56,24 +55,39 @@ class TournamentServiceImpl implements TournamentService{
     }
 
     public TournamentDto create(TournamentCreateDto tournamentDto) {
-        return tournamentMapper.toDto(tournamentRepository.save(tournamentMapper.toEntity(tournamentDto)));
+        Long userId = authService.getCurrentUser().getId();
+        Tournament tournament = tournamentMapper.toEntity(tournamentDto);
+        tournament.setOwnerId(userId);
+        userService.addAuthority(userId, Authority.ROLE_TOURNAMENT_OWNER);
+        return tournamentMapper.toDto(tournamentRepository.save(tournament));
     }
 
     public TournamentDto update(TournamentCreateDto tournamentDto, Long id) {
-        return tournamentRepository.findById(id)
-                .map(editTournament -> {
-                    editTournament.setId(id);
-                    editTournament.setName(tournamentDto.getName());
-                    editTournament.setDateTime(tournamentDto.getDateTime());
-                    editTournament.setLocation(tournamentDto.getLocation());
-                    editTournament.setStreet(tournamentDto.getStreet());
-                    editTournament.setSport(sportMapper.toEntity(sportService.getById(tournamentDto.getSportId())));
-                    return tournamentMapper.toDto(tournamentRepository.save(tournamentMapper.toEntity(tournamentDto)));
-                }).orElseThrow(() -> new EntityNotFoundException("Tournament with id " + id + " not found"));
+        if((authService.getCurrentUser().getId().equals(tournamentDto.getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
+            return tournamentRepository.findById(id)
+                    .map(editTournament -> {
+                        editTournament.setId(id);
+                        editTournament.setName(tournamentDto.getName());
+                        editTournament.setDateTime(tournamentDto.getDateTime());
+                        editTournament.setLocation(tournamentDto.getLocation());
+                        editTournament.setStreet(tournamentDto.getStreet());
+                        editTournament.setSport(sportMapper.toEntity(sportService.getById(tournamentDto.getSportId())));
+                        return tournamentMapper.toDto(tournamentRepository.save(tournamentMapper.toEntity(tournamentDto)));
+                    }).orElseThrow(() -> new EntityNotFoundException("Tournament with id " + id + " not found"));
+        } else {
+            throw new RuntimeException("You are not authorized to update this tournament");
+        }
     }
 
     public void deleteById(Long id) {
-        tournamentRepository.deleteById(id);
+        Long userId = authService.getCurrentUser().getId();
+        TournamentDto tournamentDto = getById(id);
+        if((userId.equals(tournamentDto.getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
+            userService.removeAuthority(userId, Authority.ROLE_TOURNAMENT_OWNER);
+            tournamentRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("You are not authorized to delete this tournament");
+        }
     }
 
     public List<GameTournamentDto> getMappedGames(TournamentDto tournamentDto) {

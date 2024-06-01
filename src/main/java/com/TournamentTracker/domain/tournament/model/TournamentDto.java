@@ -19,6 +19,7 @@ public class TournamentDto {
     Date dateTime;
     String location;
     String street;
+    Long ownerId;
     SportDto sport;
     List<GameTournamentDto> gamesList;
     List<TeamTournamentDto> teamsList;

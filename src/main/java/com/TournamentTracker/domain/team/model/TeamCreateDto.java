@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class TeamCreateDto {
     @NotNull(message = "Team name cannot be null")
     String name;
+    Long ownerId;
 }

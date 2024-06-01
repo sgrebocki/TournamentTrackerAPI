@@ -15,4 +15,5 @@ public class TournamentTeamDto {
     Date dateTime;
     String location;
     String street;
+    Long ownerId;
 }

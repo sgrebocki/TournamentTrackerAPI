@@ -16,10 +16,10 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(name = "name")
     private String name;
-
+    @Column(name = "owner_id")
+    private Long ownerId;
     @OneToOne
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;

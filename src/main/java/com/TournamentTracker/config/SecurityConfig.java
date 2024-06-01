@@ -1,6 +1,6 @@
 package com.TournamentTracker.config;
 
-import com.TournamentTracker.security.JwtRequestFilter;
+import com.TournamentTracker.security.jwt.JwtRequestFilter;
 import com.TournamentTracker.security.auth.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,20 +41,26 @@ public class SecurityConfig {
             "/v3/**"
     };
     private static final String USER_CONTROLLER_PATH = "/users/**";
-    private static final String USER_CONTROLLER_PATH_ROLE = "ADMIN";
+    private static final String SPORT_CONTROLLER_PATH = "/sports/**";
+    private static final String RULE_CONTROLLER_PATH = "/rules/**";
+    private static final String ADMIN_ROLE = "ADMIN";
     private static final String[] AUTH_PATHS = { "/auth/authenticate", "/auth/register" };
     private static final String[] ALLOWED_METHODS = { "GET", "POST", "PUT", "DELETE", "OPTIONS" };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
-                        authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(SWAGGER_PATHS).permitAll()
+                .authorizeHttpRequests(requestMatcherRegistry ->
+                        requestMatcherRegistry
                                 .requestMatchers(AUTH_PATHS).permitAll()
-                                .requestMatchers(HttpMethod.POST, "/tournaments").hasAuthority("TOURNAMENT_CREATOR")
-                                .requestMatchers(HttpMethod.POST, "/teams").hasAuthority("TEAM_OWNER")
-                                .requestMatchers(USER_CONTROLLER_PATH).hasAnyRole(USER_CONTROLLER_PATH_ROLE)
+                                .requestMatchers(SWAGGER_PATHS).permitAll()
+                                .requestMatchers(HttpMethod.POST, SPORT_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
+                                .requestMatchers(HttpMethod.PUT, SPORT_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
+                                .requestMatchers(HttpMethod.DELETE, SPORT_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
+                                .requestMatchers(RULE_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
+                                .requestMatchers(HttpMethod.POST, USER_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
+                                .requestMatchers(HttpMethod.PUT, USER_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
+                                .requestMatchers(HttpMethod.DELETE, USER_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
                                 .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->

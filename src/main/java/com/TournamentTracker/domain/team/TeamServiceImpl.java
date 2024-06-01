@@ -1,8 +1,12 @@
 package com.TournamentTracker.domain.team;
 
+import com.TournamentTracker.domain.team.model.Team;
 import com.TournamentTracker.domain.team.model.TeamCreateDto;
 import com.TournamentTracker.domain.team.model.TeamDto;
 import com.TournamentTracker.domain.team.model.TeamTournamentDto;
+import com.TournamentTracker.domain.user.UserService;
+import com.TournamentTracker.security.auth.AuthService;
+import com.TournamentTracker.security.auth.model.Authority;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +18,8 @@ import java.util.List;
 class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
     private final TeamMapper teamMapper;
+    private final AuthService authService;
+    private final UserService userService;
 
     public List<TeamDto> getAll() {
         return teamMapper.toDtoList(teamRepository.findAll());
@@ -26,20 +32,34 @@ class TeamServiceImpl implements TeamService {
     }
 
     public TeamDto create(TeamCreateDto teamCreateDto) {
-        return teamMapper.toDto(teamRepository.save(teamMapper.toEntity(teamCreateDto)));
+        Long userId = authService.getCurrentUser().getId();
+        Team team = teamMapper.toEntity(teamCreateDto);
+        team.setOwnerId(userId);
+        userService.addAuthority(userId, Authority.ROLE_TEAM_OWNER);
+        return teamMapper.toDto(teamRepository.save(team));
     }
 
     public TeamDto update(TeamDto teamDto, Long id) {
-        return teamRepository.findById(id)
-            .map(editTeam -> {
-                editTeam.setId(id);
-                editTeam.setName(teamDto.getName());
-                return teamMapper.toDto(teamRepository.save(teamMapper.toEntity(teamDto)));
-            }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
+        if((authService.getCurrentUser().getId().equals(teamDto.getOwnerId()) && authService.hasTeamOwnerRole()) || authService.hasAdminRole()) {
+            return teamRepository.findById(id)
+                    .map(editTeam -> {
+                        editTeam.setId(id);
+                        editTeam.setName(teamDto.getName());
+                        return teamMapper.toDto(teamRepository.save(teamMapper.toEntity(teamDto)));
+                    }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
+        } else {
+            throw new RuntimeException("You are not authorized to update this team");
+        }
     }
 
     public void deleteById(Long id) {
-        teamRepository.deleteById(id);
+        Long userId = authService.getCurrentUser().getId();
+        TeamDto teamDto = getById(id);
+        if((userId.equals(teamDto.getOwnerId()) && authService.hasTeamOwnerRole()) || authService.hasAdminRole()) {
+            teamRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("You are not authorized to delete this team");
+        }
     }
 
     public List<TeamTournamentDto> getOnlyTeams() {
