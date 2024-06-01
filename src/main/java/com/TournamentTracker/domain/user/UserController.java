@@ -3,6 +3,7 @@ package com.TournamentTracker.domain.user;
 import com.TournamentTracker.security.auth.model.Authority;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
+@Tag(name = "UserController", description = "For POST, PUT, DELETE required role: ADMIN")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 class UserController {
     private final UserService userService;
 

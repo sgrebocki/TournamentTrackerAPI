@@ -2,6 +2,7 @@ package com.TournamentTracker.domain.sport;
 
 import com.TournamentTracker.domain.sport.model.SportCreateDto;
 import com.TournamentTracker.domain.sport.model.SportDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "SportController", description = "For POST, PUT, DELETE required role: ADMIN")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/sports")
+@RequestMapping("/api/sports")
 class SportController {
     private final SportService sportService;
 

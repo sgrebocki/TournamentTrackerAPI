@@ -2,6 +2,7 @@ package com.TournamentTracker.domain.rule;
 
 
 import com.TournamentTracker.domain.rule.model.RuleDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "RuleController", description = "Required role: ADMIN")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/rules")
+@RequestMapping("/api/rules")
 class RuleController {
     private final RuleService ruleService;
 

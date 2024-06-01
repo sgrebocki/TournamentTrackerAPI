@@ -40,11 +40,11 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/v3/**"
     };
-    private static final String USER_CONTROLLER_PATH = "/users/**";
-    private static final String SPORT_CONTROLLER_PATH = "/sports/**";
-    private static final String RULE_CONTROLLER_PATH = "/rules/**";
+    private static final String USER_CONTROLLER_PATH = "/api/users/**";
+    private static final String SPORT_CONTROLLER_PATH = "/api/sports/**";
+    private static final String RULE_CONTROLLER_PATH = "/api/rules/**";
     private static final String ADMIN_ROLE = "ADMIN";
-    private static final String[] AUTH_PATHS = { "/auth/authenticate", "/auth/register" };
+    private static final String[] AUTH_PATHS = { "/api/auth/authenticate", "/api/auth/register" };
     private static final String[] ALLOWED_METHODS = { "GET", "POST", "PUT", "DELETE", "OPTIONS" };
 
     @Bean
