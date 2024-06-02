@@ -4,6 +4,7 @@ import com.TournamentTracker.domain.game.model.GameTournamentDto;
 import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import com.TournamentTracker.domain.tournament.model.TournamentCreateDto;
 import com.TournamentTracker.domain.tournament.model.TournamentDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "TournamentController", description = "For POST, PUT, DELETE required role: TOURNAMENT_CREATOR or ADMIN")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/tournaments")
