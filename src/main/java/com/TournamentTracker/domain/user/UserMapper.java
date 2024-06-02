@@ -14,6 +14,7 @@ import java.util.List;
 public interface UserMapper {
     @Mapping(source = "team.id", target = "teamId")
     UserDto toDto(User user);
+    UserDto toDto(AuthUserDto authUserDto);
     List<UserDto> toDtoList(List<User> userList);
     @Mapping(source = "teamId", target = "team.id")
     User toEntity(UserDto userDto);

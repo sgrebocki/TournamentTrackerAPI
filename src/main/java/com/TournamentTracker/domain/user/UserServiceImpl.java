@@ -1,11 +1,12 @@
 package com.TournamentTracker.domain.user;
 
 import com.TournamentTracker.domain.team.model.Team;
-import com.TournamentTracker.domain.user.model.AuthUserDto;
+import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
 import com.TournamentTracker.domain.user.model.User;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final AuthService authService;
     private final PasswordEncoder passwordEncoder;
 
     public List<UserDto> getAll() {
@@ -36,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public UserDto create(UserCreateDto userCreateDto) {
-        checkIfUserAlreadyExists(userCreateDto);
+        checkIfUserAlreadyExists(userCreateDto.getUsername());
         User user = userMapper.toEntity(userCreateDto);
         user.setAuthorities(new HashSet<>());
         user.getAuthorities().add(Authority.ROLE_USER);
@@ -49,7 +51,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id)
                 .map(existingUser -> {
                     existingUser.setUsername(userDto.getUsername());
-                    existingUser.setPassword(userDto.getPassword());
                     existingUser.setFirstName(userDto.getFirstName());
                     existingUser.setLastName(userDto.getLastName());
                     existingUser.setTeam(userDto.getTeamId() != null ? new Team(userDto.getTeamId()) : null);
@@ -104,15 +105,55 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
     }
 
-    public AuthUserDto getByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .map(userMapper::toAuthUserDto)
-                .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
+    @Transactional
+    public UserDto getAccountParameters() {
+        return userMapper.toDto(authService.getCurrentUser());
     }
 
-    private void checkIfUserAlreadyExists(UserCreateDto userCreateDto) {
-        if(userRepository.findByUsername(userCreateDto.getUsername()).isPresent()){
-            throw new RuntimeException(String.format("Użytkownik z loginem '%s' już istnieje.", userCreateDto.getUsername()));
+    @Transactional
+    public UserDto changePassword(String oldPassword, String newPassword) {
+        return userRepository.findById(authService.getCurrentUser().getId())
+                .map(user -> {
+                    checkIfOldPasswordIsValid(oldPassword, user);
+                    checkIfNewPasswordIsDifferentThanOldPassword(oldPassword, newPassword, user);
+                    user.setPassword(passwordEncoder.encode(newPassword));
+                    return userMapper.toDto(userRepository.save(user));
+                }).orElseThrow(() -> new EntityNotFoundException("User with id " + authService.getCurrentUser().getId() + " not found"));
+    }
+
+    @Transactional
+    public UserDto changeUsername(String newUsername) {
+        checkIfUsernameIsValid(newUsername);
+        checkIfUserAlreadyExists(newUsername);
+        return userRepository.findById(authService.getCurrentUser().getId())
+                .map(user -> {
+                    user.setUsername(newUsername);
+                    return userMapper.toDto(userRepository.save(user));
+                }).orElseThrow(() -> new EntityNotFoundException("User with id " + authService.getCurrentUser().getId() + " not found"));
+    }
+
+    private void checkIfUsernameIsValid(String username) {
+        if (!username.contains("@") || !username.contains(".")) {
+            throw new IllegalArgumentException("Username should be an email");
         }
     }
+
+    private void checkIfUserAlreadyExists(String username) {
+        if(userRepository.findByUsername(username).isPresent()){
+            throw new RuntimeException(String.format("Użytkownik z loginem '%s' już istnieje.", username));
+        }
+    }
+
+    private void checkIfOldPasswordIsValid(String oldPassword, User user) {
+        if(!passwordEncoder.matches(oldPassword, user.getPassword())){
+            throw new IllegalArgumentException("Old password is not valid");
+        }
+    }
+
+    private void checkIfNewPasswordIsDifferentThanOldPassword(String oldPassword, String newPassword, User user) {
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException("New password should be different than the old one");
+        }
+    }
+
 }
