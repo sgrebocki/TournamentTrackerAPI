@@ -45,7 +45,7 @@ class TeamServiceImpl implements TeamService {
                     .map(editTeam -> {
                         editTeam.setId(id);
                         editTeam.setName(teamDto.getName());
-                        return teamMapper.toDto(teamRepository.save(teamMapper.toEntity(teamDto)));
+                        return teamMapper.toDto(teamRepository.save(editTeam));
                     }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
         } else {
             throw new RuntimeException("You are not authorized to update this team");
