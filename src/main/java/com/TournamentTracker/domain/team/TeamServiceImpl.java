@@ -27,8 +27,14 @@ class TeamServiceImpl implements TeamService {
 
     public TeamDto getById(Long id) {
         return teamRepository.findById(id)
-            .map(teamMapper::toDto)
-            .orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
+                .map(team -> {
+                    TeamDto teamDto = teamMapper.toDto(team);
+
+                    Long currentUserId = authService.getCurrentUser().getId();
+                    teamDto.setCanUpdateOrDelete(currentUserId.equals(team.getOwnerId()));
+
+                    return teamDto;
+                }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
     }
 
     public TeamDto create(TeamCreateDto teamCreateDto) {

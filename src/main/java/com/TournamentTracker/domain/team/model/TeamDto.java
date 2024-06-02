@@ -15,5 +15,6 @@ public class TeamDto {
     @NotNull(message = "Team name cannot be null")
     String name;
     Long ownerId;
+    Boolean canUpdateOrDelete;
     TournamentTeamDto tournament;
 }

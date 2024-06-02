@@ -18,6 +18,7 @@ public class TournamentDto {
     String location;
     String street;
     Long ownerId;
+    Boolean canUpdateOrDelete;
     SportDto sport;
     List<GameTournamentDto> gamesList;
     List<TeamTournamentDto> teamsList;
