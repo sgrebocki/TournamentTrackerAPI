@@ -50,6 +50,9 @@ class TournamentServiceImpl implements TournamentService{
                     tournamentDto.setGamesList(getMappedGames(tournamentDto));
                     tournamentDto.setTeamsList(getMappedTeams(tournamentDto));
 
+                    Long currentUserId = authService.getCurrentUser().getId();
+                    tournamentDto.setCanUpdateOrDelete(currentUserId.equals(tournament.getOwnerId()));
+
                     return tournamentDto;
                 }).orElseThrow(() -> new EntityNotFoundException("Tournament with id " + id + " not found"));
     }
