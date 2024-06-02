@@ -56,6 +56,9 @@ class TournamentServiceImpl implements TournamentService{
 
     public TournamentDto create(TournamentCreateDto tournamentDto) {
         Long userId = authService.getCurrentUser().getId();
+        if (isUserAlreadyOwner(userId)) {
+            throw new RuntimeException("You are already an owner of a tournament");
+        }
         Tournament tournament = tournamentMapper.toEntity(tournamentDto);
         tournament.setOwnerId(userId);
         userService.addAuthority(userId, Authority.ROLE_TOURNAMENT_OWNER);
@@ -101,5 +104,9 @@ class TournamentServiceImpl implements TournamentService{
                 .stream()
                 .filter(team -> team.getTournamentId() != null && team.getTournamentId().equals(tournamentDto.getId()))
                 .collect(Collectors.toList());
+    }
+
+    public boolean isUserAlreadyOwner(Long userId) {
+        return tournamentRepository.findByOwnerId(userId).isPresent();
     }
 }
