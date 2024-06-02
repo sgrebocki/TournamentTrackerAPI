@@ -52,4 +52,18 @@ class GameController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
+
+    @PutMapping("/{id}/setFinalScore")
+    public ResponseEntity<String> setFinalScore(@PathVariable Long id, @RequestParam Long homeTeamScore, @RequestParam Long guestTeamScore){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(gameService.setFinalScore(id, homeTeamScore, guestTeamScore));
+    }
+
+    @GetMapping("/{tournamentId}")
+    public ResponseEntity<List<GameDto>> getTournamentGames(@PathVariable Long tournamentId){
+        List<GameDto> games = gameService.getGamesByTournamentId(tournamentId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(games);
+    }
+
 }

@@ -9,6 +9,7 @@ import com.TournamentTracker.domain.team.model.TeamDto;
 import com.TournamentTracker.domain.tournament.TournamentMapper;
 import com.TournamentTracker.domain.tournament.TournamentService;
 import com.TournamentTracker.domain.tournament.model.TournamentDto;
+import com.TournamentTracker.security.auth.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,33 +24,40 @@ class GameTeamServiceImpl implements GameTeamService {
     private final TeamMapper teamMapper;
     private final TournamentService tournamentService;
     private final TournamentMapper tournamentMapper;
+    private final AuthService authService;
 
     @Transactional
     public GameDto create(GameCreateDto gameDto) {
-        Game game = gameMapper.toEntity(gameDto);
+        if((!authService.getCurrentUser().getId().equals(gameDto.getTournamentId()) && !authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
+            Game game = gameMapper.toEntity(gameDto);
 
-        TeamDto homeTeam = teamService.getById(gameDto.getHomeTeamId());
-        TeamDto guestTeam = teamService.getById(gameDto.getGuestTeamId());
-        TournamentDto tournament = tournamentService.getById(gameDto.getTournamentId());
+            TeamDto homeTeam = teamService.getById(gameDto.getHomeTeamId());
+            TeamDto guestTeam = teamService.getById(gameDto.getGuestTeamId());
+            TournamentDto tournament = tournamentService.getById(gameDto.getTournamentId());
 
-        game.setHomeTeam(teamMapper.toEntity(homeTeam));
-        game.setGuestTeam(teamMapper.toEntity(guestTeam));
-        game.setTournament(tournamentMapper.toEntity(tournament));
+            game.setHomeTeam(teamMapper.toEntity(homeTeam));
+            game.setGuestTeam(teamMapper.toEntity(guestTeam));
+            game.setTournament(tournamentMapper.toEntity(tournament));
 
-        return gameMapper.toDto(gameRepository.save(game));
+            return gameMapper.toDto(gameRepository.save(game));
+        } else {
+            throw new IllegalArgumentException("You can't create game for other user's tournament");
+        }
     }
 
     @Transactional
     public GameDto update(GameDto gameDto, Long id) {
+        if((!authService.getCurrentUser().getId().equals(gameDto.getTournament().getId()) && !authService.hasTournamentOwnerRole()) || authService.hasAdminRole()){
         return gameRepository.findById(id)
                 .map(editGame -> {
                     editGame.setGameTime(gameDto.getGameTime());
                     editGame.setHomeTeam(teamMapper.toEntity(gameDto.getHomeTeam()));
-                    editGame.setHomeTeamScore(gameDto.getHomeTeamScore());
                     editGame.setGuestTeam(teamMapper.toEntity(gameDto.getGuestTeam()));
-                    editGame.setGuestTeamScore(gameDto.getGuestTeamScore());
                     editGame.setTournament(tournamentMapper.toEntity(gameDto.getTournament()));
                     return gameMapper.toDto(gameRepository.save(editGame));
                 }).orElseThrow(() -> new EntityNotFoundException("Game with id " + id + " not found"));
+        } else {
+            throw new RuntimeException("You are not authorized to update this game");
+        }
     }
 }
