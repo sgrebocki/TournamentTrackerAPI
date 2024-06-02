@@ -1,11 +1,11 @@
 package com.TournamentTracker.security.auth;
 
 import com.TournamentTracker.domain.user.UserMapper;
-import com.TournamentTracker.domain.user.UserService;
+import com.TournamentTracker.domain.user.UserRepository;
 import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.domain.user.model.User;
-import com.TournamentTracker.domain.user.model.UserDto;
 import com.TournamentTracker.security.auth.model.Authority;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,15 +16,18 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 class AuthServiceImpl implements AuthService {
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
+
     public AuthUserDto getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("User is not authenticated");
         }
         String username = authentication.getName();
-        return userService.getByUsername(username);
+        return userRepository.findByUsername(username)
+                .map(userMapper::toAuthUserDto)
+                .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
     }
 
     public Set<Authority> getCurrentUserAuthorities() {
