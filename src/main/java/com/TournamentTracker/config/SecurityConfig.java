@@ -1,7 +1,7 @@
 package com.TournamentTracker.config;
 
 import com.TournamentTracker.security.jwt.JwtRequestFilter;
-import com.TournamentTracker.security.auth.UserDetailsServiceImpl;
+import com.TournamentTracker.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +43,15 @@ public class SecurityConfig {
     private static final String USER_CONTROLLER_PATH = "/api/users/**";
     private static final String SPORT_CONTROLLER_PATH = "/api/sports/**";
     private static final String RULE_CONTROLLER_PATH = "/api/rules/**";
+    private static final String[] NOT_LOGGED_ALLOWED_PATHS = {
+            USER_CONTROLLER_PATH,
+            SPORT_CONTROLLER_PATH,
+            RULE_CONTROLLER_PATH,
+            "/api/teams/**",
+            "/api/tournaments/**",
+            "/api/games/**",
+            "/api/rules/**",
+    };
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String[] AUTH_PATHS = { "/api/auth/authenticate", "/api/auth/register" };
     private static final String[] ALLOWED_METHODS = { "GET", "POST", "PUT", "DELETE", "OPTIONS" };
@@ -54,6 +63,7 @@ public class SecurityConfig {
                         requestMatcherRegistry
                                 .requestMatchers(AUTH_PATHS).permitAll()
                                 .requestMatchers(SWAGGER_PATHS).permitAll()
+                                .requestMatchers(HttpMethod.GET, NOT_LOGGED_ALLOWED_PATHS).permitAll()
                                 .requestMatchers(HttpMethod.POST, SPORT_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
                                 .requestMatchers(HttpMethod.PUT, SPORT_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)
                                 .requestMatchers(HttpMethod.DELETE, SPORT_CONTROLLER_PATH).hasAnyRole(ADMIN_ROLE)

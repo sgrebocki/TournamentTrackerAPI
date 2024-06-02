@@ -1,4 +1,4 @@
-package com.TournamentTracker.security.auth;
+package com.TournamentTracker.security;
 
 import com.TournamentTracker.domain.user.UserRepository;
 import com.TournamentTracker.domain.user.model.User;
