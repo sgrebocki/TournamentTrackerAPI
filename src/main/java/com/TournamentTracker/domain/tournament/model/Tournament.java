@@ -1,14 +1,13 @@
 package com.TournamentTracker.domain.tournament.model;
 
 import com.TournamentTracker.domain.sport.model.Sport;
-import com.TournamentTracker.domain.team.model.Team;
+import com.TournamentTracker.util.LocalDateTimeAttributeConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.Set;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,7 +22,8 @@ public class Tournament {
     @Column(name = "name")
     private String name;
     @Column(name = "date_time")
-    private Date dateTime;
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
+    private LocalDateTime dateTime;
     @Column(name = "location")
     private String location;
     @Column(name = "street")
