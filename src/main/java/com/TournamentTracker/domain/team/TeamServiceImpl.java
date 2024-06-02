@@ -33,6 +33,9 @@ class TeamServiceImpl implements TeamService {
 
     public TeamDto create(TeamCreateDto teamCreateDto) {
         Long userId = authService.getCurrentUser().getId();
+        if (isUserAlreadyOwner(userId)) {
+            throw new RuntimeException("You are already an owner of a team");
+        }
         Team team = teamMapper.toEntity(teamCreateDto);
         team.setOwnerId(userId);
         userService.addAuthority(userId, Authority.ROLE_TEAM_OWNER);
@@ -64,5 +67,9 @@ class TeamServiceImpl implements TeamService {
 
     public List<TeamTournamentDto> getOnlyTeams() {
         return teamMapper.toTeamTournamentDtoList(teamRepository.findAll());
+    }
+
+    public boolean isUserAlreadyOwner(Long userId) {
+        return teamRepository.findByOwnerId(userId).isPresent();
     }
 }
