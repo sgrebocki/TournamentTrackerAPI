@@ -33,7 +33,7 @@ class SportServiceImpl implements SportService{
             .map(editSport -> {
                 editSport.setId(id);
                 editSport.setSportName(sportDto.getSportName());
-                return sportMapper.toDto(sportRepository.save(sportMapper.toEntity(sportDto)));
+                return sportMapper.toDto(sportRepository.save(editSport));
             }).orElseThrow(() -> new EntityNotFoundException("Sport with id " + id + "not found"));
     }
 

@@ -71,7 +71,7 @@ class TournamentServiceImpl implements TournamentService{
                         editTournament.setLocation(tournamentDto.getLocation());
                         editTournament.setStreet(tournamentDto.getStreet());
                         editTournament.setSport(sportMapper.toEntity(sportService.getById(tournamentDto.getSportId())));
-                        return tournamentMapper.toDto(tournamentRepository.save(tournamentMapper.toEntity(tournamentDto)));
+                        return tournamentMapper.toDto(tournamentRepository.save(editTournament));
                     }).orElseThrow(() -> new EntityNotFoundException("Tournament with id " + id + " not found"));
         } else {
             throw new RuntimeException("You are not authorized to update this tournament");

@@ -6,7 +6,6 @@ import com.TournamentTracker.domain.tournament.TournamentMapper;
 import com.TournamentTracker.domain.tournament.TournamentService;
 import com.TournamentTracker.security.auth.AuthService;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 class TeamTournamentServiceImpl implements TeamTournamentService {
     private final TeamRepository teamRepository;
-    private final TeamMapper teamMapper;
     private final TeamTournamentMapper teamTournamentMapper;
     private final TournamentService tournamentService;
     private final TournamentMapper tournamentMapper;
@@ -25,7 +23,7 @@ class TeamTournamentServiceImpl implements TeamTournamentService {
             return teamRepository.findById(id)
                     .map(editTeam -> {
                         editTeam.setTournament(tournamentMapper.toEntity(tournamentService.getById(teamDto.getTournament().getId())));
-                        return teamTournamentMapper.toDto(teamRepository.save(teamMapper.toEntity(teamDto)));
+                        return teamTournamentMapper.toDto(teamRepository.save(editTeam));
                     }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
         } else {
             throw new RuntimeException("You are not authorized to sign up this team for tournament");
@@ -37,7 +35,7 @@ class TeamTournamentServiceImpl implements TeamTournamentService {
             return teamRepository.findById(id)
                     .map(editTeam -> {
                         editTeam.setTournament(null);
-                        return teamTournamentMapper.toDto(teamRepository.save(teamMapper.toEntity(teamDto)));
+                        return teamTournamentMapper.toDto(teamRepository.save(editTeam));
                     }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
         } else {
             throw new RuntimeException("You are not authorized to sign out this team from tournament");

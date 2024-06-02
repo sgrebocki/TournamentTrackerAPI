@@ -34,7 +34,7 @@ class RuleServiceImpl implements RuleService{
                     editRule.setBreakTime(ruleDto.getBreakTime());
                     editRule.setFullTime(ruleDto.getFullTime());
                     editRule.setParts(ruleDto.getParts());
-                    return ruleMapper.toDto(ruleRepository.save(ruleMapper.toEntity(ruleDto)));
+                    return ruleMapper.toDto(ruleRepository.save(editRule));
                 }).orElseThrow(() -> new EntityNotFoundException("Rule with id " + id + "not found"));
     }
 
