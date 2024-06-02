@@ -3,9 +3,11 @@ package com.TournamentTracker.security.auth;
 import com.TournamentTracker.domain.user.UserService;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
+import com.TournamentTracker.security.UserDetailsServiceImpl;
 import com.TournamentTracker.security.jwt.JwtTokenUtil;
 import com.TournamentTracker.security.auth.model.AuthRequest;
 import com.TournamentTracker.security.auth.model.AuthResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "AuthController", description = "Authentication and registration")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

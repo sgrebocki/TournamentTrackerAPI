@@ -1,6 +1,6 @@
 package com.TournamentTracker.security.jwt;
 
-import com.TournamentTracker.security.auth.UserDetailsServiceImpl;
+import com.TournamentTracker.security.UserDetailsServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
