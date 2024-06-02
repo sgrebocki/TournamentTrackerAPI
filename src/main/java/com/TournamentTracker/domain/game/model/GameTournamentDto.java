@@ -1,18 +1,18 @@
 package com.TournamentTracker.domain.game.model;
 
-import com.TournamentTracker.domain.team.model.TeamDto;
+import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class GameTournamentDto {
     Long id;
-    Date gameTime;
-    TeamDto homeTeam;
+    LocalDateTime gameTime;
+    TeamTournamentDto homeTeam;
     Long homeTeamScore;
-    TeamDto guestTeam;
+    TeamTournamentDto guestTeam;
     Long guestTeamScore;
     String finalScore;
     @JsonIgnore

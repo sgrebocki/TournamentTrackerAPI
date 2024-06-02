@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -12,7 +12,7 @@ import java.util.Date;
 public class TournamentTeamDto {
     Long id;
     String name;
-    Date dateTime;
+    LocalDateTime dateTime;
     String location;
     String street;
     Long ownerId;

@@ -2,12 +2,13 @@ package com.TournamentTracker.domain.game.model;
 
 import com.TournamentTracker.domain.team.model.Team;
 import com.TournamentTracker.domain.tournament.model.Tournament;
+import com.TournamentTracker.util.LocalDateTimeAttributeConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,7 +21,8 @@ public class Game {
     @Column(name = "id")
     Long id;
     @Column(name = "game_time")
-    Date gameTime;
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
+    LocalDateTime gameTime;
     @OneToOne
     @JoinColumn(name = "home_team_id")
     Team homeTeam;
@@ -34,4 +36,8 @@ public class Game {
     @OneToOne
     @JoinColumn(name = "tournament_id")
     Tournament tournament;
+
+    public void setGameTimeToCurrentTime() {
+        this.gameTime = LocalDateTime.now();
+    }
 }

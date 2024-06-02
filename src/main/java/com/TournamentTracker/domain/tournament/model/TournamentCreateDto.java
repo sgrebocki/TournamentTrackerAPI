@@ -3,13 +3,13 @@ package com.TournamentTracker.domain.tournament.model;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 public class TournamentCreateDto {
     String name;
-    Date dateTime;
+    LocalDateTime dateTime;
     String location;
     String street;
     Long ownerId;
