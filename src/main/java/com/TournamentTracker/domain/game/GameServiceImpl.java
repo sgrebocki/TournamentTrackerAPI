@@ -29,7 +29,7 @@ class GameServiceImpl implements GameService{
     public void deleteById(Long id) {
         Long userId = authService.getCurrentUser().getId();
         GameDto gameDto = getById(id);
-        if((userId.equals(gameDto.getTournament().getId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
+        if((userId.equals(gameDto.getTournament().getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
             gameRepository.deleteById(id);
         } else {
             throw new RuntimeException("You are not authorized to delete this game");
@@ -51,7 +51,7 @@ class GameServiceImpl implements GameService{
 
     public String setFinalScore(Long id, Long homeTeamScore, Long guestTeamScore) {
         GameDto gameDto = getById(id);
-        if((authService.getCurrentUser().getId().equals(gameDto.getTournament().getId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
+        if((authService.getCurrentUser().getId().equals(gameDto.getTournament().getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
             gameDto.setHomeTeamScore(homeTeamScore);
             gameDto.setGuestTeamScore(guestTeamScore);
             gameDto.setFinalScore(homeTeamScore + " : " + guestTeamScore);
