@@ -5,10 +5,7 @@ import com.TournamentTracker.domain.user.model.UserDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "AccountController", description = "Current user account management")
 @RestController
@@ -23,12 +20,12 @@ class AccountController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/changePassword")
+    @PutMapping("/changePassword")
     public ResponseEntity<UserDto> changePassword(@RequestParam String oldPassword, @RequestParam String newPassword) {
         return ResponseEntity.ok(userService.changePassword(oldPassword, newPassword));
     }
 
-    @GetMapping("/changeUsername")
+    @PutMapping("/changeUsername")
     public ResponseEntity<UserDto> changeUsername(@RequestParam String newUsername) {
         return ResponseEntity.ok(userService.changeUsername(newUsername));
     }
