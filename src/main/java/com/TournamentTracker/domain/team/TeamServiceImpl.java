@@ -5,6 +5,7 @@ import com.TournamentTracker.domain.team.model.TeamCreateDto;
 import com.TournamentTracker.domain.team.model.TeamDto;
 import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import com.TournamentTracker.domain.user.UserService;
+import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,14 +39,17 @@ class TeamServiceImpl implements TeamService {
     }
 
     public TeamDto create(TeamCreateDto teamCreateDto) {
-        Long userId = authService.getCurrentUser().getId();
-        if (isUserAlreadyOwner(userId)) {
-            throw new RuntimeException("You are already an owner of a team");
+        AuthUserDto currentUser = authService.getCurrentUser();
+        if (isUserAlreadyOwner(currentUser.getId()) || isUserInTeam()) {
+            throw new RuntimeException("You are already an owner or member of a team");
         }
+        userService.addAuthority(currentUser.getId(), Authority.ROLE_TEAM_OWNER);
         Team team = teamMapper.toEntity(teamCreateDto);
-        team.setOwnerId(userId);
-        userService.addAuthority(userId, Authority.ROLE_TEAM_OWNER);
-        return teamMapper.toDto(teamRepository.save(team));
+        team.setOwnerId(currentUser.getId());
+        Team savedTeam = teamRepository.save(team);
+
+        userService.setTeamForUser(currentUser.getId(), savedTeam);
+        return teamMapper.toDto(savedTeam);
     }
 
     public TeamDto update(TeamDto teamDto, Long id) {
@@ -62,9 +66,10 @@ class TeamServiceImpl implements TeamService {
     }
 
     public void deleteById(Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        AuthUserDto currentUser = authService.getCurrentUser();
         TeamDto teamDto = getById(id);
-        if((userId.equals(teamDto.getOwnerId()) && authService.hasTeamOwnerRole()) || authService.hasAdminRole()) {
+        if((currentUser.getId().equals(teamDto.getOwnerId()) && authService.hasTeamOwnerRole()) || authService.hasAdminRole()) {
+            userService.removeAuthority(currentUser.getId(), Authority.ROLE_TEAM_OWNER);
             teamRepository.deleteById(id);
         } else {
             throw new RuntimeException("You are not authorized to delete this team");
@@ -75,7 +80,17 @@ class TeamServiceImpl implements TeamService {
         return teamMapper.toTeamTournamentDtoList(teamRepository.findAll());
     }
 
+    public TeamDto getOwnedTeam(Long userId) {
+        return teamRepository.findByOwnerId(userId)
+                .map(teamMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " does not own any team"));
+    }
+
     public boolean isUserAlreadyOwner(Long userId) {
-        return teamRepository.findByOwnerId(userId).isPresent();
+        return !teamRepository.findAllByOwnerId(userId).isEmpty();
+    }
+
+    public boolean isUserInTeam(){
+        return authService.getCurrentUser().getTeam() != null;
     }
 }

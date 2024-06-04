@@ -1,12 +1,14 @@
 package com.TournamentTracker.domain.user;
 
 import com.TournamentTracker.domain.team.model.Team;
+import com.TournamentTracker.domain.team.model.TeamCreateDto;
+import com.TournamentTracker.domain.team.model.TeamDto;
+import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
 import com.TournamentTracker.domain.user.model.User;
 import com.TournamentTracker.domain.user.model.UserCreateDto;
 import com.TournamentTracker.domain.user.model.UserDto;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -106,8 +108,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public UserDto getAccountParameters() {
-        return userMapper.toDto(authService.getCurrentUser());
+    public AuthUserDto getAccountParameters() {
+        return authService.getCurrentUser();
     }
 
     @Transactional
@@ -130,6 +132,14 @@ public class UserServiceImpl implements UserService {
                     user.setUsername(newUsername);
                     return userMapper.toDto(userRepository.save(user));
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + authService.getCurrentUser().getId() + " not found"));
+    }
+
+    public void setTeamForUser(Long userId, Team team) {
+        userRepository.findById(userId)
+                .ifPresent(user -> {
+                    user.setTeam(team);
+                    userRepository.save(user);
+                });
     }
 
     private void checkIfUsernameIsValid(String username) {

@@ -6,6 +6,6 @@ import com.TournamentTracker.domain.team.model.TeamTournamentDto;
 import java.util.List;
 
 public interface TeamTournamentService {
-    TeamTournamentDto signUpForTournament(TeamDto teamDto, Long id);
-    TeamTournamentDto signOutFromTournament(TeamDto teamDto, Long id);
+    TeamTournamentDto signUpForTournament(Long tournamentId);
+    TeamTournamentDto signOutFromTournament(Long tournamentId);
 }
