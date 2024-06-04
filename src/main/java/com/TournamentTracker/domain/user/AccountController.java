@@ -1,5 +1,6 @@
 package com.TournamentTracker.domain.user;
 
+import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.domain.user.model.UserDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,9 @@ class AccountController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<UserDto> getAccountParameters(){
-        UserDto userDto = userService.getAccountParameters();
-        return ResponseEntity.ok(userDto);
+    public ResponseEntity<AuthUserDto> getAccountParameters(){
+        AuthUserDto user = userService.getAccountParameters();
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/changePassword")

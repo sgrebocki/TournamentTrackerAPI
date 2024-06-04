@@ -13,4 +13,5 @@ public interface TeamService {
     TeamDto update(TeamDto teamDto, Long id);
     void deleteById(Long id);
     List<TeamTournamentDto> getOnlyTeams();
+    TeamDto getOwnedTeam(Long userId);
 }

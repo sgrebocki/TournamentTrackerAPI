@@ -10,6 +10,7 @@ import com.TournamentTracker.domain.tournament.model.Tournament;
 import com.TournamentTracker.domain.tournament.model.TournamentCreateDto;
 import com.TournamentTracker.domain.tournament.model.TournamentDto;
 import com.TournamentTracker.domain.user.UserService;
+import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
 import jakarta.persistence.EntityNotFoundException;
@@ -58,14 +59,16 @@ class TournamentServiceImpl implements TournamentService{
     }
 
     public TournamentDto create(TournamentCreateDto tournamentDto) {
-        Long userId = authService.getCurrentUser().getId();
-        if (isUserAlreadyOwner(userId)) {
+        AuthUserDto currentUser = authService.getCurrentUser();
+        if (isUserAlreadyOwner(currentUser.getId())) {
             throw new RuntimeException("You are already an owner of a tournament");
         }
         Tournament tournament = tournamentMapper.toEntity(tournamentDto);
-        tournament.setOwnerId(userId);
-        userService.addAuthority(userId, Authority.ROLE_TOURNAMENT_OWNER);
-        return tournamentMapper.toDto(tournamentRepository.save(tournament));
+        tournament.setOwnerId(currentUser.getId());
+        Tournament savedTournament = tournamentRepository.save(tournament);
+
+        userService.addAuthority(currentUser.getId(), Authority.ROLE_TOURNAMENT_OWNER);
+        return tournamentMapper.toDto(savedTournament);
     }
 
     public TournamentDto update(TournamentCreateDto tournamentDto, Long id) {
@@ -85,10 +88,10 @@ class TournamentServiceImpl implements TournamentService{
     }
 
     public void deleteById(Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        AuthUserDto currentUser = authService.getCurrentUser();
         TournamentDto tournamentDto = getById(id);
-        if((userId.equals(tournamentDto.getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
-            userService.removeAuthority(userId, Authority.ROLE_TOURNAMENT_OWNER);
+        if((currentUser.getId().equals(tournamentDto.getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
+            userService.removeAuthority(currentUser.getId(), Authority.ROLE_TOURNAMENT_OWNER);
             tournamentRepository.deleteById(id);
         } else {
             throw new RuntimeException("You are not authorized to delete this tournament");
@@ -110,6 +113,6 @@ class TournamentServiceImpl implements TournamentService{
     }
 
     public boolean isUserAlreadyOwner(Long userId) {
-        return tournamentRepository.findByOwnerId(userId).isPresent();
+        return !tournamentRepository.findAllByOwnerId(userId).isEmpty();
     }
 }
