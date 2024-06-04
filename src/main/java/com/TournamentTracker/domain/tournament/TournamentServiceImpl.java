@@ -15,6 +15,9 @@ import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,8 +54,11 @@ class TournamentServiceImpl implements TournamentService{
                     tournamentDto.setGamesList(getMappedGames(tournamentDto));
                     tournamentDto.setTeamsList(getMappedTeams(tournamentDto));
 
-                    Long currentUserId = authService.getCurrentUser().getId();
-                    tournamentDto.setCanUpdateOrDelete(currentUserId.equals(tournament.getOwnerId()));
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    if(!(authentication instanceof AnonymousAuthenticationToken)) {
+                        Long currentUserId = authService.getCurrentUser().getId();
+                        tournamentDto.setCanUpdateOrDelete(currentUserId.equals(tournament.getOwnerId()));
+                    }
 
                     return tournamentDto;
                 }).orElseThrow(() -> new EntityNotFoundException("Tournament with id " + id + " not found"));
