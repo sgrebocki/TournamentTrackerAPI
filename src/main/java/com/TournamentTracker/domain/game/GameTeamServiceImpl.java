@@ -28,16 +28,16 @@ class GameTeamServiceImpl implements GameTeamService {
 
     @Transactional
     public GameDto create(GameCreateDto gameDto) {
-        if((authService.getCurrentUser().getId().equals(gameDto.getTournamentId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
+        TournamentDto tournamentDto = tournamentService.getById(gameDto.getTournamentId());
+        if((authService.getCurrentUser().getId().equals(tournamentDto.getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
             Game game = gameMapper.toEntity(gameDto);
 
             TeamDto homeTeam = teamService.getById(gameDto.getHomeTeamId());
             TeamDto guestTeam = teamService.getById(gameDto.getGuestTeamId());
-            TournamentDto tournament = tournamentService.getById(gameDto.getTournamentId());
 
             game.setHomeTeam(teamMapper.toEntity(homeTeam));
             game.setGuestTeam(teamMapper.toEntity(guestTeam));
-            game.setTournament(tournamentMapper.toEntity(tournament));
+            game.setTournament(tournamentMapper.toEntity(tournamentDto));
 
             return gameMapper.toDto(gameRepository.save(game));
         } else {
@@ -47,7 +47,7 @@ class GameTeamServiceImpl implements GameTeamService {
 
     @Transactional
     public GameDto update(GameDto gameDto, Long id) {
-        if((authService.getCurrentUser().getId().equals(gameDto.getTournament().getId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()){
+        if((authService.getCurrentUser().getId().equals(gameDto.getTournament().getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()){
         return gameRepository.findById(id)
                 .map(editGame -> {
                     editGame.setGameTime(gameDto.getGameTime());
