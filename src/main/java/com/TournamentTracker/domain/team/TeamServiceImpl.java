@@ -10,6 +10,9 @@ import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,8 +34,11 @@ class TeamServiceImpl implements TeamService {
                 .map(team -> {
                     TeamDto teamDto = teamMapper.toDto(team);
 
-                    Long currentUserId = authService.getCurrentUser().getId();
-                    teamDto.setCanUpdateOrDelete(currentUserId.equals(team.getOwnerId()));
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+                        Long currentUserId = authService.getCurrentUser().getId();
+                        teamDto.setCanUpdateOrDelete(currentUserId.equals(team.getOwnerId()));
+                    }
 
                     return teamDto;
                 }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
