@@ -13,6 +13,7 @@ import java.util.List;
 @Mapper(config = CustomMapperConfig.class)
 public interface UserMapper {
     @Mapping(source = "team.id", target = "teamId")
+    @Mapping(source = "id", target = "userId")
     UserDto toDto(User user);
     UserDto toDto(AuthUserDto authUserDto);
     List<UserDto> toDtoList(List<User> userList);

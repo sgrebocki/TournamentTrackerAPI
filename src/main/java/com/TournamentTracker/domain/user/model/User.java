@@ -27,7 +27,7 @@ public class User {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
     @ElementCollection(fetch = FetchType.EAGER)

@@ -12,7 +12,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 public class UserDto {
-    Long id;
+    Long userId;
     @Email(message = "Nazwa użytkownika musi być poprawnie sformatowanym adresem e-mail")
     @NotBlank(message = "Nazwa użytkownika nie może być pusta")
     String username;

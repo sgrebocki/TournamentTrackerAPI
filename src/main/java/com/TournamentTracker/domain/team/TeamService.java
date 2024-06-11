@@ -12,6 +12,8 @@ public interface TeamService {
     TeamDto create(TeamCreateDto teamCreateDto);
     TeamDto update(TeamDto teamDto, Long id);
     void deleteById(Long id);
+    void addUserToTeam(Long teamId, Long userId);
+    void quitFromTeam(Long teamId);
     List<TeamTournamentDto> getOnlyTeams();
     TeamDto getOwnedTeam(Long userId);
 }

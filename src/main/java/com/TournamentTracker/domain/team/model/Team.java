@@ -1,10 +1,14 @@
 package com.TournamentTracker.domain.team.model;
 
 import com.TournamentTracker.domain.tournament.model.Tournament;
+import com.TournamentTracker.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,7 +27,8 @@ public class Team {
     @OneToOne
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
-
+    @OneToMany(mappedBy = "team")
+    private List<User> users;
     public Team(Long teamId) {
     }
 }
