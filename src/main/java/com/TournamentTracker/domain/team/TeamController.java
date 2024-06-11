@@ -50,7 +50,18 @@ class TeamController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeam(@PathVariable Long id){
         teamService.deleteById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/{teamId}/addUser/{userId}")
+    public ResponseEntity<Void> addUserToTeam(@PathVariable Long teamId, @PathVariable Long userId) {
+        teamService.addUserToTeam(teamId, userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/{teamId}/quit")
+    public ResponseEntity<Void> quitFromTeam(@PathVariable Long teamId) {
+        teamService.quitFromTeam(teamId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
