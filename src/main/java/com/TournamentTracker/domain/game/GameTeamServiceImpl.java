@@ -10,10 +10,15 @@ import com.TournamentTracker.domain.tournament.TournamentMapper;
 import com.TournamentTracker.domain.tournament.TournamentService;
 import com.TournamentTracker.domain.tournament.model.TournamentDto;
 import com.TournamentTracker.security.auth.AuthService;
+import com.TournamentTracker.util.handler.exception.IllegalAccessException;
+import com.TournamentTracker.util.handler.exception.NotAuthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.TournamentTracker.util.ExceptionMessages.GAME_NOT_FOUND;
+import static com.TournamentTracker.util.ExceptionMessages.NOT_AUTHORIZED_GAME_TOURNAMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +46,7 @@ class GameTeamServiceImpl implements GameTeamService {
 
             return gameMapper.toDto(gameRepository.save(game));
         } else {
-            throw new IllegalArgumentException("You can't create game for other user's tournament");
+            throw new IllegalAccessException(NOT_AUTHORIZED_GAME_TOURNAMENT);
         }
     }
 
@@ -54,9 +59,9 @@ class GameTeamServiceImpl implements GameTeamService {
                     editGame.setGuestTeam(teamMapper.toEntity(gameDto.getGuestTeam()));
                     editGame.setTournament(tournamentMapper.toEntity(gameDto.getTournament()));
                     return gameMapper.toDto(gameRepository.save(editGame));
-                }).orElseThrow(() -> new EntityNotFoundException("Game with id " + id + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(GAME_NOT_FOUND, id)));
         } else {
-            throw new RuntimeException("You are not authorized to update this game");
+            throw new NotAuthorizedException(NOT_AUTHORIZED_GAME_TOURNAMENT);
         }
     }
 }

@@ -11,6 +11,5 @@ public interface GameService {
     void deleteById(Long id);
     List<GameTournamentDto> getOnlyGames();
     String setFinalScore(Long id, Long homeTeamScore, Long guestTeamScore);
-    String getFinalScore(Long id);
     List<GameDto> getGamesByTournamentId(Long tournamentId);
 }

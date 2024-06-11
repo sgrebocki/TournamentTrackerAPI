@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.TournamentTracker.util.ExceptionMessages.SPORT_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -23,7 +25,7 @@ class SportServiceImpl implements SportService{
     public SportDto getById(Long id){
         return sportRepository.findById(id)
                 .map(sportMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("Sport with id " + id + "not found"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(SPORT_NOT_FOUND, id)));
     }
 
     public SportDto create(SportCreateDto sportDto){
@@ -36,7 +38,7 @@ class SportServiceImpl implements SportService{
                 editSport.setId(id);
                 editSport.setSportName(sportDto.getSportName());
                 return sportMapper.toDto(sportRepository.save(editSport));
-            }).orElseThrow(() -> new EntityNotFoundException("Sport with id " + id + "not found"));
+            }).orElseThrow(() -> new EntityNotFoundException(String.format(SPORT_NOT_FOUND, id)));
     }
 
     public void deleteById(Long id) {

@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
+import static com.TournamentTracker.util.ExceptionMessages.USER_NOT_AUTHENTICATED;
+import static com.TournamentTracker.util.ExceptionMessages.USER_NOT_FOUND_BY_USERNAME;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,12 +27,12 @@ class AuthServiceImpl implements AuthService {
     public AuthUserDto getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User is not authenticated");
+            throw new RuntimeException(USER_NOT_AUTHENTICATED);
         }
         String username = authentication.getName();
         return userRepository.findByUsername(username)
                 .map(userMapper::toAuthUserDto)
-                .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_USERNAME, username)));
     }
 
     public Set<Authority> getCurrentUserAuthorities() {
