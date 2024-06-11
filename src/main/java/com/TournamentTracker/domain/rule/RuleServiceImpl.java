@@ -4,11 +4,13 @@ import com.TournamentTracker.domain.rule.model.RuleDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 class RuleServiceImpl implements RuleService{
     private final RuleRepository ruleRepository;
     private final RuleMapper ruleMapper;

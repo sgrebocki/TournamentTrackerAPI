@@ -5,11 +5,13 @@ import com.TournamentTracker.domain.sport.model.SportDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 class SportServiceImpl implements SportService{
     private final SportRepository sportRepository;
     private final SportMapper sportMapper;

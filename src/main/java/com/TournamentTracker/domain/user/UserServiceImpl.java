@@ -1,8 +1,6 @@
 package com.TournamentTracker.domain.user;
 
 import com.TournamentTracker.domain.team.model.Team;
-import com.TournamentTracker.domain.team.model.TeamCreateDto;
-import com.TournamentTracker.domain.team.model.TeamDto;
 import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
@@ -21,6 +19,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -38,7 +37,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
-    @Transactional
     public UserDto create(UserCreateDto userCreateDto) {
         checkIfUserAlreadyExists(userCreateDto.getUsername());
         User user = userMapper.toEntity(userCreateDto);
@@ -48,7 +46,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
-    @Transactional
     public UserDto update(UserDto userDto, Long id) {
         return userRepository.findById(id)
                 .map(existingUser -> {
@@ -61,7 +58,6 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
-    @Transactional
     public void deleteById(Long id) {
         UserDto userDto = getById(id);
         userDto.getAuthorities().clear();
@@ -69,7 +65,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    @Transactional
     public void deleteMany(List<Long> ids){
         for(Long id : ids) {
             UserDto userDto = getById(id);
@@ -80,7 +75,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteAllById(ids);
     }
 
-    @Transactional
     public UserDto addAuthority(Long userId, Authority authority) {
         return userRepository.findById(userId)
                 .map(user -> {
@@ -89,7 +83,6 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
     }
 
-    @Transactional
     public UserDto removeAuthority(Long userId, Authority authority) {
         return userRepository.findById(userId)
                 .map(user -> {
@@ -98,7 +91,6 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
     }
 
-    @Transactional
     public UserDto updateAuthorities(Long userId, Set<Authority> authorities) {
         return userRepository.findById(userId)
                 .map(user -> {
@@ -107,12 +99,10 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
     }
 
-    @Transactional
     public AuthUserDto getAccountParameters() {
         return authService.getCurrentUser();
     }
 
-    @Transactional
     public UserDto changePassword(String oldPassword, String newPassword) {
         return userRepository.findById(authService.getCurrentUser().getId())
                 .map(user -> {
@@ -123,7 +113,6 @@ public class UserServiceImpl implements UserService {
                 }).orElseThrow(() -> new EntityNotFoundException("User with id " + authService.getCurrentUser().getId() + " not found"));
     }
 
-    @Transactional
     public UserDto changeUsername(String newUsername) {
         checkIfUsernameIsValid(newUsername);
         checkIfUserAlreadyExists(newUsername);

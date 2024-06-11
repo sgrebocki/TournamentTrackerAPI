@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 class GameTeamServiceImpl implements GameTeamService {
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;
@@ -26,7 +27,6 @@ class GameTeamServiceImpl implements GameTeamService {
     private final TournamentMapper tournamentMapper;
     private final AuthService authService;
 
-    @Transactional
     public GameDto create(GameCreateDto gameDto) {
         TournamentDto tournamentDto = tournamentService.getById(gameDto.getTournamentId());
         if((authService.getCurrentUser().getId().equals(tournamentDto.getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
@@ -45,7 +45,6 @@ class GameTeamServiceImpl implements GameTeamService {
         }
     }
 
-    @Transactional
     public GameDto update(GameDto gameDto, Long id) {
         if((authService.getCurrentUser().getId().equals(gameDto.getTournament().getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()){
         return gameRepository.findById(id)
