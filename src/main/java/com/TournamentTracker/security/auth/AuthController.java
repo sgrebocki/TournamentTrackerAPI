@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.TournamentTracker.util.ExceptionMessages.USERNAME_OR_PASSWORD_INCORRECT;
+
 @Tag(name = "AuthController", description = "Authentication and registration")
 @RestController
 @RequestMapping("/api/auth")
@@ -38,7 +40,7 @@ public class AuthController {
             final String token = jwtTokenUtil.generateToken(userDetails);
             return ResponseEntity.ok(new AuthResponse(token));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(USERNAME_OR_PASSWORD_INCORRECT);
         }
     }
 

@@ -6,10 +6,14 @@ import com.TournamentTracker.domain.tournament.TournamentMapper;
 import com.TournamentTracker.domain.tournament.TournamentService;
 import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.AuthService;
+import com.TournamentTracker.util.handler.exception.IllegalAccessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.TournamentTracker.util.ExceptionMessages.NOT_OWNER_OF_TEAM;
+import static com.TournamentTracker.util.ExceptionMessages.TEAM_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +35,9 @@ class TeamTournamentServiceImpl implements TeamTournamentService {
                     .map(editTeam -> {
                         editTeam.setTournament(tournamentMapper.toEntity(tournamentService.getById(tournamentId)));
                         return teamTournamentMapper.toDto(teamRepository.save(editTeam));
-                    }).orElseThrow(() -> new EntityNotFoundException("Team with id " + team.getId() + " not found"));
+                    }).orElseThrow(() -> new EntityNotFoundException(String.format(TEAM_NOT_FOUND, team.getId())));
         } else {
-            throw new RuntimeException("You are not owner of any team");
+            throw new IllegalAccessException(NOT_OWNER_OF_TEAM);
         }
     }
 
@@ -46,9 +50,9 @@ class TeamTournamentServiceImpl implements TeamTournamentService {
                     .map(editTeam -> {
                         editTeam.setTournament(null);
                         return teamTournamentMapper.toDto(teamRepository.save(editTeam));
-                    }).orElseThrow(() -> new EntityNotFoundException("Team with id " + team.getId() + " not found"));
+                    }).orElseThrow(() -> new EntityNotFoundException(String.format(TEAM_NOT_FOUND, team.getId())));
         } else {
-            throw new RuntimeException("You are not owner of any team");
+            throw new IllegalAccessException(NOT_OWNER_OF_TEAM);
         }
     }
 }

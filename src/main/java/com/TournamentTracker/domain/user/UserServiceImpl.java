@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.TournamentTracker.util.ExceptionMessages.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, id)));
     }
 
     public UserDto create(UserCreateDto userCreateDto) {
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService {
                     existingUser.setTeam(userDto.getTeamId() != null ? new Team(userDto.getTeamId()) : null);
                     existingUser.setAuthorities(userDto.getAuthorities());
                     return userMapper.toDto(userRepository.save(existingUser));
-                }).orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, id)));
     }
 
     public void deleteById(Long id) {
@@ -80,7 +82,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> {
                     user.getAuthorities().add(authority);
                     return userMapper.toDto(userRepository.save(user));
-                }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, userId)));
     }
 
     public UserDto removeAuthority(Long userId, Authority authority) {
@@ -88,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> {
                     user.getAuthorities().remove(authority);
                     return userMapper.toDto(userRepository.save(user));
-                }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, userId)));
     }
 
     public UserDto updateAuthorities(Long userId, Set<Authority> authorities) {
@@ -96,7 +98,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> {
                     user.setAuthorities(authorities);
                     return userMapper.toDto(userRepository.save(user));
-                }).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, userId)));
     }
 
     public AuthUserDto getAccountParameters() {
@@ -110,7 +112,7 @@ public class UserServiceImpl implements UserService {
                     checkIfNewPasswordIsDifferentThanOldPassword(oldPassword, newPassword, user);
                     user.setPassword(passwordEncoder.encode(newPassword));
                     return userMapper.toDto(userRepository.save(user));
-                }).orElseThrow(() -> new EntityNotFoundException("User with id " + authService.getCurrentUser().getId() + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, authService.getCurrentUser().getId())));
     }
 
     public UserDto changeUsername(String newUsername) {
@@ -120,7 +122,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> {
                     user.setUsername(newUsername);
                     return userMapper.toDto(userRepository.save(user));
-                }).orElseThrow(() -> new EntityNotFoundException("User with id " + authService.getCurrentUser().getId() + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, authService.getCurrentUser().getId())));
     }
 
     public void setTeamForUser(Long userId, Team team) {
@@ -133,25 +135,25 @@ public class UserServiceImpl implements UserService {
 
     private void checkIfUsernameIsValid(String username) {
         if (!username.contains("@") || !username.contains(".")) {
-            throw new IllegalArgumentException("Username should be an email");
+            throw new IllegalArgumentException(USERNAME_SHOULD_BE_EMAIL);
         }
     }
 
     private void checkIfUserAlreadyExists(String username) {
         if(userRepository.findByUsername(username).isPresent()){
-            throw new RuntimeException(String.format("Użytkownik z loginem '%s' już istnieje.", username));
+            throw new IllegalArgumentException(String.format(USER_ALREADY_EXISTS, username));
         }
     }
 
     private void checkIfOldPasswordIsValid(String oldPassword, User user) {
         if(!passwordEncoder.matches(oldPassword, user.getPassword())){
-            throw new IllegalArgumentException("Old password is not valid");
+            throw new IllegalArgumentException(OLD_PASSWORD_DOES_NOT_MATCH);
         }
     }
 
     private void checkIfNewPasswordIsDifferentThanOldPassword(String oldPassword, String newPassword, User user) {
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new IllegalArgumentException("New password should be different than the old one");
+            throw new IllegalArgumentException(NEW_PASSWORD_SHOULD_BE_DIFFERENT);
         }
     }
 
