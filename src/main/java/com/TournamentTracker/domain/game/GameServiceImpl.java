@@ -6,11 +6,13 @@ import com.TournamentTracker.security.auth.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 class GameServiceImpl implements GameService{
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;

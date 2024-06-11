@@ -9,9 +9,11 @@ import com.TournamentTracker.security.auth.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 class TeamTournamentServiceImpl implements TeamTournamentService {
     private final TeamRepository teamRepository;
     private final TeamService teamService;
