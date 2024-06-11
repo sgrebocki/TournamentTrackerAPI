@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.TournamentTracker.util.ExceptionMessages.RULE_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,7 +24,7 @@ class RuleServiceImpl implements RuleService{
     public RuleDto getById(Long id) {
         return ruleRepository.findById(id)
                 .map(ruleMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("Rule with id " + id + "not found"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(RULE_NOT_FOUND, id)));
     }
 
     public RuleDto create(RuleDto ruleDto) {
@@ -37,7 +39,7 @@ class RuleServiceImpl implements RuleService{
                     editRule.setFullTime(ruleDto.getFullTime());
                     editRule.setParts(ruleDto.getParts());
                     return ruleMapper.toDto(ruleRepository.save(editRule));
-                }).orElseThrow(() -> new EntityNotFoundException("Rule with id " + id + "not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(RULE_NOT_FOUND, id)));
     }
 
     public void deleteById(Long id) {

@@ -1,13 +1,15 @@
 package com.TournamentTracker.util.handler;
 
+import com.TournamentTracker.util.handler.exception.IllegalAccessException;
+import com.TournamentTracker.util.handler.exception.NotAuthorizedException;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
@@ -15,8 +17,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return super.handleHttpMessageNotReadable(ex, headers, status, request);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(ex.getMessage());
+    @ExceptionHandler(NotAuthorizedException.class)
+    public ResponseEntity<Object> NotAuthorizedException(Exception ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalAccessException.class)
+    public ResponseEntity<Object> IllegalAccessException(Exception ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.APPLICATION_JSON).body(ex.getMessage());
     }
 }

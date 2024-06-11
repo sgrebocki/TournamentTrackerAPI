@@ -11,6 +11,8 @@ import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.domain.user.model.User;
 import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
+import com.TournamentTracker.util.handler.exception.IllegalAccessException;
+import com.TournamentTracker.util.handler.exception.NotAuthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -22,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.TournamentTracker.util.ExceptionMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -58,13 +62,13 @@ class TeamServiceImpl implements TeamService {
                     teamDto.setUsers(userMapper.toDtoList(team.getUsers()));
 
                     return teamDto;
-                }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(TEAM_NOT_FOUND, id)));
     }
 
     public TeamDto create(TeamCreateDto teamCreateDto) {
         AuthUserDto currentUser = authService.getCurrentUser();
         if ((isUserAlreadyOwner(currentUser.getId()) || isUserInTeam()) || authService.hasAdminRole()) {
-            throw new RuntimeException("You are already an owner or member of a team");
+            throw new IllegalAccessException(OWNER_OR_MEMBER_OF_TEAM);
         }
         userService.addAuthority(currentUser.getId(), Authority.ROLE_TEAM_OWNER);
         Team team = teamMapper.toEntity(teamCreateDto);
@@ -82,9 +86,9 @@ class TeamServiceImpl implements TeamService {
                         editTeam.setId(id);
                         editTeam.setName(teamDto.getName());
                         return teamMapper.toDto(teamRepository.save(editTeam));
-                    }).orElseThrow(() -> new EntityNotFoundException("Team with id " + id + " not found"));
+                    }).orElseThrow(() -> new EntityNotFoundException(String.format(TEAM_NOT_FOUND, id)));
         } else {
-            throw new RuntimeException("You are not authorized to update this team");
+            throw new NotAuthorizedException(NOT_AUTHORIZED_TEAM);
         }
     }
 
@@ -95,7 +99,7 @@ class TeamServiceImpl implements TeamService {
             userService.removeAuthority(currentUser.getId(), Authority.ROLE_TEAM_OWNER);
             teamRepository.deleteById(id);
         } else {
-            throw new RuntimeException("You are not authorized to delete this team");
+            throw new NotAuthorizedException(NOT_AUTHORIZED_TEAM);
         }
     }
 
@@ -105,10 +109,10 @@ class TeamServiceImpl implements TeamService {
         User user = userMapper.toEntity(userService.getById(userId));
 
         if (!team.getOwnerId().equals(currentUser.getId())) {
-            throw new RuntimeException("You are not authorized to add users to this team");
+            throw new NotAuthorizedException(NOT_AUTHORIZED_TEAM);
         }
         if (user.getTeam().getId() != null) {
-            throw new RuntimeException("User is already a member of a team");
+            throw new IllegalAccessException("Użytkownik jest już członkiem innej drużyny");
         }
 
         team.setUsers(List.of(user));
@@ -123,10 +127,10 @@ class TeamServiceImpl implements TeamService {
         Team team = teamMapper.toEntity(getById(teamId));
 
         if(!Objects.equals(currentUser.getTeam().getId(), teamId)){
-            throw new RuntimeException("You are not a member this team");
+            throw new IllegalAccessException("Nie jesteś członkiem tej drużyny");
         }
         if(isUserAlreadyOwner(currentUser.getId())){
-            throw new RuntimeException("You are the owner of a team, you can't quit from it");
+            throw new IllegalAccessException("Jesteś założycielem drużyny, nie możesz jej opuścić");
         }
         user.setTeam(null);
         team.getUsers().remove(user);
@@ -141,7 +145,7 @@ class TeamServiceImpl implements TeamService {
     public TeamDto getOwnedTeam(Long userId) {
         return teamRepository.findByOwnerId(userId)
                 .map(teamMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " does not own any team"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Użytkownik z id %s nie jest załozycielem żadnej drużyny.", userId)));
     }
 
     public boolean isUserAlreadyOwner(Long userId) {

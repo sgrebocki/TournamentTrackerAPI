@@ -3,12 +3,16 @@ package com.TournamentTracker.domain.game;
 import com.TournamentTracker.domain.game.model.GameDto;
 import com.TournamentTracker.domain.game.model.GameTournamentDto;
 import com.TournamentTracker.security.auth.AuthService;
+import com.TournamentTracker.util.handler.exception.NotAuthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.TournamentTracker.util.ExceptionMessages.GAME_NOT_FOUND;
+import static com.TournamentTracker.util.ExceptionMessages.NOT_AUTHORIZED_GAME_TOURNAMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +29,7 @@ class GameServiceImpl implements GameService{
     public GameDto getById(Long id) {
         return gameRepository.findById(id)
                 .map(gameMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("Game with id " + id + "not found"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(GAME_NOT_FOUND, id)));
     }
 
     public void deleteById(Long id) {
@@ -34,7 +38,7 @@ class GameServiceImpl implements GameService{
         if((userId.equals(gameDto.getTournament().getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
             gameRepository.deleteById(id);
         } else {
-            throw new RuntimeException("You are not authorized to delete this game");
+            throw new NotAuthorizedException(NOT_AUTHORIZED_GAME_TOURNAMENT);
         }
     }
 
@@ -46,11 +50,6 @@ class GameServiceImpl implements GameService{
         return gameMapper.toGameTournamentDtoList(gameRepository.findAll());
     }
 
-    public String getFinalScore(Long id) {
-        GameDto gameDto = getById(id);
-        return gameDto.getHomeTeamScore() + " : " + gameDto.getGuestTeamScore();
-    }
-
     public String setFinalScore(Long id, Long homeTeamScore, Long guestTeamScore) {
         GameDto gameDto = getById(id);
         if((authService.getCurrentUser().getId().equals(gameDto.getTournament().getOwnerId()) && authService.hasTournamentOwnerRole()) || authService.hasAdminRole()) {
@@ -58,9 +57,9 @@ class GameServiceImpl implements GameService{
             gameDto.setGuestTeamScore(guestTeamScore);
             gameDto.setFinalScore(homeTeamScore + " : " + guestTeamScore);
             gameRepository.save(gameMapper.toEntity(gameDto));
-            return "Final score set successfully";
+            return String.format("Wynik dla meczu o id %s został ustawiony %s : %s", id, homeTeamScore, guestTeamScore);
         } else {
-            throw new RuntimeException("You are not authorized to set final score for this game");
+            throw new NotAuthorizedException(NOT_AUTHORIZED_GAME_TOURNAMENT);
         }
     }
 

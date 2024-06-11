@@ -13,6 +13,7 @@ import com.TournamentTracker.domain.user.UserService;
 import com.TournamentTracker.domain.user.model.AuthUserDto;
 import com.TournamentTracker.security.auth.AuthService;
 import com.TournamentTracker.security.auth.model.Authority;
+import com.TournamentTracker.util.handler.exception.NotAuthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.TournamentTracker.util.ExceptionMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -63,13 +66,13 @@ class TournamentServiceImpl implements TournamentService{
                     }
 
                     return tournamentDto;
-                }).orElseThrow(() -> new EntityNotFoundException("Tournament with id " + id + " not found"));
+                }).orElseThrow(() -> new EntityNotFoundException(String.format(TOURNAMENT_NOT_FOUND, id)));
     }
 
     public TournamentDto create(TournamentCreateDto tournamentDto) {
         AuthUserDto currentUser = authService.getCurrentUser();
         if (isUserAlreadyOwner(currentUser.getId())) {
-            throw new RuntimeException("You are already an owner of a tournament");
+            throw new RuntimeException(ALREADY_OWNER_OF_TOURNAMENT);
         }
         Tournament tournament = tournamentMapper.toEntity(tournamentDto);
         tournament.setOwnerId(currentUser.getId());
@@ -89,9 +92,9 @@ class TournamentServiceImpl implements TournamentService{
                         editTournament.setStreet(tournamentDto.getStreet());
                         editTournament.setSport(sportMapper.toEntity(sportService.getById(tournamentDto.getSportId())));
                         return tournamentMapper.toDto(tournamentRepository.save(editTournament));
-                    }).orElseThrow(() -> new EntityNotFoundException("Tournament with id " + id + " not found"));
+                    }).orElseThrow(() -> new EntityNotFoundException(String.format(TOURNAMENT_NOT_FOUND, id)));
         } else {
-            throw new RuntimeException("You are not authorized to update this tournament");
+            throw new NotAuthorizedException(String.format(NOT_AUTHORIZED_TOURNAMENT));
         }
     }
 
@@ -102,7 +105,7 @@ class TournamentServiceImpl implements TournamentService{
             userService.removeAuthority(currentUser.getId(), Authority.ROLE_TOURNAMENT_OWNER);
             tournamentRepository.deleteById(id);
         } else {
-            throw new RuntimeException("You are not authorized to delete this tournament");
+            throw new NotAuthorizedException(NOT_AUTHORIZED_TOURNAMENT);
         }
     }
 
