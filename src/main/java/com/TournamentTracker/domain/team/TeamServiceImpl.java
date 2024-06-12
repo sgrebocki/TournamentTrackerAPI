@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -83,7 +84,6 @@ class TeamServiceImpl implements TeamService {
         if((authService.getCurrentUser().getId().equals(teamDto.getOwnerId()) && authService.hasTeamOwnerRole()) || authService.hasAdminRole()) {
             return teamRepository.findById(id)
                     .map(editTeam -> {
-                        editTeam.setId(id);
                         editTeam.setName(teamDto.getName());
                         return teamMapper.toDto(teamRepository.save(editTeam));
                     }).orElseThrow(() -> new EntityNotFoundException(String.format(TEAM_NOT_FOUND, id)));
@@ -106,16 +106,22 @@ class TeamServiceImpl implements TeamService {
     public void addUserToTeam(Long teamId, Long userId) {
         AuthUserDto currentUser = authService.getCurrentUser();
         Team team = teamMapper.toEntity(getById(teamId));
-        User user = userMapper.toEntity(userService.getById(userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, userId)));
 
         if (!team.getOwnerId().equals(currentUser.getId())) {
             throw new NotAuthorizedException(NOT_AUTHORIZED_TEAM);
         }
-        if (user.getTeam().getId() != null) {
+
+        if (user.getTeam() != null) {
             throw new IllegalAccessException("Użytkownik jest już członkiem innej drużyny");
         }
 
-        team.setUsers(List.of(user));
+        if (team.getUsers() == null) {
+            team.setUsers(new ArrayList<>());
+        }
+
+        team.getUsers().add(user);
         user.setTeam(team);
         userRepository.save(user);
         teamRepository.save(team);
