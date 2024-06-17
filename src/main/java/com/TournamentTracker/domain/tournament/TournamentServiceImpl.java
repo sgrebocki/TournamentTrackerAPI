@@ -61,8 +61,8 @@ class TournamentServiceImpl implements TournamentService{
 
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                     if(!(authentication instanceof AnonymousAuthenticationToken)) {
-                        Long currentUserId = authService.getCurrentUser().getId();
-                        tournamentDto.setCanUpdateOrDelete(currentUserId.equals(tournament.getOwnerId()));
+                        AuthUserDto currentUser = authService.getCurrentUser();
+                        tournamentDto.setCanUpdateOrDelete(currentUser.getId().equals(tournament.getOwnerId()) || authService.hasAdminRole());
                     }
 
                     return tournamentDto;

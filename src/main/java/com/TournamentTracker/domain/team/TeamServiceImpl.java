@@ -48,7 +48,6 @@ class TeamServiceImpl implements TeamService {
                 }).collect(Collectors.toList());
     }
 
-    @Transactional
     public TeamDto getById(Long id) {
         return teamRepository.findById(id)
                 .map(team -> {
@@ -56,8 +55,8 @@ class TeamServiceImpl implements TeamService {
 
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                     if (!(authentication instanceof AnonymousAuthenticationToken)) {
-                        Long currentUserId = authService.getCurrentUser().getId();
-                        teamDto.setCanUpdateOrDelete(currentUserId.equals(team.getOwnerId()));
+                        AuthUserDto currentUser = authService.getCurrentUser();
+                        teamDto.setCanUpdateOrDelete(currentUser.getId().equals(team.getOwnerId()) || authService.hasAdminRole());
                     }
 
                     teamDto.setUsers(userMapper.toDtoList(team.getUsers()));
@@ -129,7 +128,8 @@ class TeamServiceImpl implements TeamService {
 
     public void quitFromTeam(Long teamId){
         AuthUserDto currentUser = authService.getCurrentUser();
-        User user = userMapper.toEntity(userService.getById(currentUser.getId()));
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_BY_ID, currentUser.getId())));
         Team team = teamMapper.toEntity(getById(teamId));
 
         if(!Objects.equals(currentUser.getTeam().getId(), teamId)){
@@ -139,7 +139,11 @@ class TeamServiceImpl implements TeamService {
             throw new IllegalAccessException("Jesteś założycielem drużyny, nie możesz jej opuścić");
         }
         user.setTeam(null);
-        team.getUsers().remove(user);
+
+        if (team.getUsers() != null) {
+            team.getUsers().remove(user);
+        }
+
         userRepository.save(user);
         teamRepository.save(team);
     }
